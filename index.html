@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手势控制3D圣诞树 (最终完美版)</title>
+    <title>Merry Christmas</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js -->
@@ -59,6 +59,7 @@
         h1 {
             font-family: 'Cinzel', serif;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            color: #ffd700;
         }
 
         .glass-panel {
@@ -94,9 +95,9 @@
         <!-- Header -->
         <div class="flex justify-between items-start">
             <div class="glass-panel p-6 rounded-xl max-w-md transition-all duration-700 transform translate-y-0 opacity-100" id="intro-panel">
-                <h1 class="text-3xl text-yellow-400 mb-2 font-bold tracking-widest">NOEL LUMINA</h1>
+                <h1 class="text-3xl text-yellow-400 mb-2 font-bold tracking-widest">Merry Christmas</h1>
                 <p class="text-gray-300 text-xs mb-6 leading-relaxed border-l-2 border-yellow-600 pl-3">
-                    WebGL 沉浸式互动体验<br>请开启摄像头，用手势掌控魔法
+                    请开启摄像头，用手势掌控魔法
                 </p>
                 
                 <div class="space-y-4">
@@ -124,7 +125,7 @@
                         </div>
                         <div>
                             <p class="text-red-100 text-sm font-bold uppercase tracking-wide">捏合 (Pinch)</p>
-                            <p class="text-gray-400 text-xs">抓取照片 (需先移动光标瞄准)</p>
+                            <p class="text-gray-400 text-xs">抓取</p>
                         </div>
                     </div>
                 </div>
@@ -140,8 +141,8 @@
                 <div class="flex flex-col items-center justify-center w-12 h-12">
                     <span class="text-2xl text-gray-400 group-hover:text-yellow-400 transition-colors">📷</span>
                 </div>
-                <!-- 允许选择多个图片，支持 jpg, png, webp -->
-                <input type="file" id="photo-upload" multiple accept="image/png, image/jpeg, image/webp" class="hidden">
+                <!-- 允许选择多个图片，支持 jpg, png, webp, mp4 -->
+                <input type="file" id="photo-upload" multiple accept="image/*, video/mp4, video/webm, video/ogg" class="hidden">
             </div>
         </div>
 
@@ -206,8 +207,8 @@
 
             // Scene
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x020202, 0.015);
-            scene.background = new THREE.Color(0x020202);
+            scene.fog = new THREE.FogExp2(0x050505, 0.015);
+            scene.background = new THREE.Color(0x050505);
 
             // Camera
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -222,7 +223,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 0.9; // Slightly lower exposure
+            renderer.toneMappingExposure = 0.9; 
             renderer.outputColorSpace = THREE.SRGBColorSpace;
             
             maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -231,7 +232,7 @@
             // Post Processing
             const renderScene = new RenderPass(scene, camera);
             
-            // FIX 1: Higher Threshold (0.85) so photos (usually ~0.5-0.8 brightness) don't glow
+            // Bloom
             bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
             bloomPass.threshold = 0.85; 
             bloomPass.strength = 1.5; 
@@ -245,7 +246,6 @@
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.05);
             scene.add(ambientLight);
             
-            // Stronger lights to interact with materials
             const spotLight = new THREE.SpotLight(0xffd700, 2000);
             spotLight.position.set(20, 50, 20);
             spotLight.decay = 2;
@@ -283,7 +283,6 @@
 
         // --- Particle System ---
         const createParticles = () => {
-            // FIX 2: Boost Emissive Intensity so they glow even with high threshold
             const matGold = new THREE.MeshStandardMaterial({ 
                 color: CONFIG.colors.gold, 
                 metalness: 1.0, 
@@ -308,10 +307,11 @@
 
             const geomSphere = new THREE.SphereGeometry(0.35, 12, 12);
             const geomCube = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+            const geomCyl = new THREE.CylinderGeometry(0.1, 0.1, 1, 8);
             
             const meshGold = new THREE.InstancedMesh(geomSphere, matGold, 400);
             const meshGreen = new THREE.InstancedMesh(geomCube, matGreen, 800);
-            const meshRed = new THREE.InstancedMesh(geomSphere, matRed, 400);
+            const meshRed = new THREE.InstancedMesh(geomCyl, matRed, 400);
 
             scene.add(meshGold);
             scene.add(meshGreen);
@@ -346,7 +346,9 @@
                         chaosPos: new THREE.Vector3(cx, cy, cz),
                         currentPos: new THREE.Vector3(tx, y, tz),
                         wobbleOffset: Math.random() * 100,
-                        wobbleSpeed: Math.random() * 0.5 + 0.5
+                        wobbleSpeed: Math.random() * 0.5 + 0.5,
+                        baseScale: dummy.scale.clone(),
+                        baseRotation: dummy.rotation.clone(),
                     });
                 }
             };
@@ -356,16 +358,18 @@
             distribute(meshRed, 'red', 2);
         };
 
-        // --- Photo System ---
-        const createPhoto = (texture, index) => {
+        // --- Photo/Video System ---
+        const createPhoto = (texture, index, videoElement = null) => {
             const group = new THREE.Group();
             
             texture.anisotropy = maxAnisotropy;
-            texture.minFilter = THREE.LinearMipmapLinearFilter;
+            texture.minFilter = THREE.LinearFilter; 
             texture.magFilter = THREE.LinearFilter;
             
             let aspect = 0.8;
-            if (texture.image && texture.image.width && texture.image.height) {
+            if (videoElement) {
+                if(videoElement.videoWidth) aspect = videoElement.videoWidth / videoElement.videoHeight;
+            } else if (texture.image && texture.image.width) {
                 aspect = texture.image.width / texture.image.height;
             }
             
@@ -385,7 +389,7 @@
             pMesh.position.z = 0.08; 
             pMesh.name = "photo_surface"; 
             
-            // FIX 3: Darker Frame Color (0xeeeeee) so it doesn't trigger bloom
+            // Frame Plane
             const fWidth = width + 1; 
             const fHeight = height + 2.5; 
             const fGeo = new THREE.PlaneGeometry(fWidth, fHeight);
@@ -404,7 +408,8 @@
             group.userData = {
                 chaosPos: new THREE.Vector3(cx, cy, cz),
                 treePos: new THREE.Vector3(0, 15, 0),
-                velocity: new THREE.Vector3((Math.random()-0.5)*0.02, (Math.random()-0.5)*0.02, 0)
+                velocity: new THREE.Vector3((Math.random()-0.5)*0.02, (Math.random()-0.5)*0.02, 0),
+                video: videoElement 
             };
             
             group.scale.set(0,0,0);
@@ -415,45 +420,68 @@
         };
 
         const createDefaultPhotos = () => {
-            const imageUrls = [
-                './c2804e004b3298fd844f6fc931dabd51.jpg',
-                './3937903cff4c216da2d7b8e10e09bebb.jpg',
-                './508a188f8d2c0f8d17d312e3f923b294.jpg',
-                './3bd9c41b6ec25b00526d612af704615e.jpg',
+            const defaultContent = [
+                // 默认图片
+                { type: 'image', url: './3bd9c41b6ec25b00526d612af704615e.jpg' },
+                { type: 'image', url: './508a188f8d2c0f8d17d312e3f923b294.jpg' },
+                { type: 'image', url: './3937903cff4c216da2d7b8e10e09bebb.jpg' },
+                { type: 'image', url: './c2804e004b3298fd844f6fc931dabd51.jpg' },
+                // 如果有本地视频，取消下方注释并修改路径
+                { type: 'video', url: './9afa134d03acde97bb67b24a1e643d46.mp4' }
             ];
 
-            imageUrls.forEach((url, i) => {
-                loader.load(url, (tex) => {
-                    tex.colorSpace = THREE.SRGBColorSpace;
-                    createPhoto(tex, i);
-                }, undefined, () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 512; canvas.height = 512;
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#C41E3A';
-                    ctx.fillRect(0,0,512,512);
-                    ctx.fillStyle = '#fff';
-                    ctx.fillText('Noel', 200, 256);
-                    const t = new THREE.CanvasTexture(canvas);
-                    t.colorSpace = THREE.SRGBColorSpace;
-                    createPhoto(t, i);
-                });
+            defaultContent.forEach((item, i) => {
+                if (item.type === 'video') {
+                    const video = document.createElement('video');
+                    video.src = item.url;
+                    video.loop = true;
+                    video.muted = true; 
+                    video.playsInline = true;
+                    video.crossOrigin = "anonymous";
+                    video.play().catch(e => console.log("Auto-play prevented"));
+
+                    video.onloadedmetadata = () => {
+                        const texture = new THREE.VideoTexture(video);
+                        texture.colorSpace = THREE.SRGBColorSpace;
+                        createPhoto(texture, i, video);
+                    };
+                    video.onerror = () => {
+                        console.warn("Video failed to load");
+                        createFallbackCard(i, "Video Error");
+                    }
+                } else {
+                    loader.load(item.url, (tex) => {
+                        tex.colorSpace = THREE.SRGBColorSpace;
+                        createPhoto(tex, i);
+                    }, undefined, () => {
+                        createFallbackCard(i, "Noel");
+                    });
+                }
             });
+        };
+
+        const createFallbackCard = (index, text) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#C41E3A'; ctx.fillRect(0,0,512,512);
+            ctx.fillStyle = '#fff'; 
+            ctx.font = '60px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 256, 256);
+            const t = new THREE.CanvasTexture(canvas);
+            t.colorSpace = THREE.SRGBColorSpace;
+            createPhoto(t, index);
         };
 
         // --- Logic Update ---
         const updateState = (delta, time) => {
             
-            // FIX 4: Dynamic Bloom Strength
-            // If focused, turn off bloom completely to ensure clear text/image
             const targetBloomStrength = (STATE.mode === 'FOCUS') ? 0.0 : 1.5;
-            // Smoothly interpolate bloom
             bloomPass.strength += (targetBloomStrength - bloomPass.strength) * 4.0 * delta;
-
 
             const dummy = new THREE.Object3D();
             
-            // 1. Cursor & Camera
             if (STATE.mode === 'EXPLODE' || STATE.mode === 'FOCUS') {
                 if (STATE.handDetected) {
                     raycaster.setFromCamera(STATE.handPosition, camera);
@@ -495,7 +523,6 @@
                 cursorMesh.visible = false;
             }
 
-            // 2. Particles
             const lerpSpeed = 4.0 * delta;
             particles.forEach(p => {
                 let target = (STATE.mode === 'TREE') ? p.treePos : p.chaosPos;
@@ -512,11 +539,14 @@
             });
             scene.children.filter(c => c.isInstancedMesh).forEach(m => m.instanceMatrix.needsUpdate = true);
 
-            // 3. Photos
             photoMeshes.forEach(group => {
                 if (STATE.mode === 'TREE') {
                     group.scale.lerp(new THREE.Vector3(0,0,0), lerpSpeed);
                     group.position.lerp(group.userData.treePos, lerpSpeed);
+                    if(group.userData.video) {
+                        group.userData.video.muted = true; 
+                        group.userData.video.play(); 
+                    }
                 } else {
                     group.visible = true;
                     if (STATE.mode === 'FOCUS' && group === focusedPhoto) {
@@ -553,7 +583,6 @@
             composer.setSize(window.innerWidth, window.innerHeight);
         };
 
-        // --- MediaPipe Logic ---
         const videoElement = document.getElementById('input-video');
         const startBtn = document.getElementById('start-btn');
         const feedbackEl = document.getElementById('gesture-feedback');
@@ -588,20 +617,10 @@
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 STATE.handDetected = true;
                 const lm = results.multiHandLandmarks[0];
-                
-                let ndcX = (1 - lm[9].x) * 2 - 1; 
-                let ndcY = (1 - lm[9].y) * 2 - 1;
-                
-                ndcX *= 1.3;
-                ndcY *= 1.3;
-                ndcY += 0.2; 
-
-                ndcX = Math.max(-1, Math.min(1, ndcX));
-                ndcY = Math.max(-1, Math.min(1, ndcY));
-
-                STATE.handPosition.x = ndcX;
-                STATE.handPosition.y = ndcY;
-
+                let ndcX = (1 - lm[9].x) * 2 - 1; let ndcY = (1 - lm[9].y) * 2 - 1;
+                ndcX *= 1.3; ndcY *= 1.3; ndcY += 0.2; 
+                ndcX = Math.max(-1, Math.min(1, ndcX)); ndcY = Math.max(-1, Math.min(1, ndcY));
+                STATE.handPosition.x = ndcX; STATE.handPosition.y = ndcY;
                 processGesture(lm);
             } else {
                 STATE.handDetected = false;
@@ -612,44 +631,20 @@
         };
 
         const processGesture = (lm) => {
-            const dist = (i, j) => Math.sqrt(
-                Math.pow(lm[i].x - lm[j].x, 2) + 
-                Math.pow(lm[i].y - lm[j].y, 2) + 
-                Math.pow(lm[i].z - lm[j].z, 2)
-            );
-
-            const scale = dist(0, 9);
-            if (scale < 0.02) return;
-
+            const dist = (i, j) => Math.sqrt(Math.pow(lm[i].x - lm[j].x, 2) + Math.pow(lm[i].y - lm[j].y, 2) + Math.pow(lm[i].z - lm[j].z, 2));
+            const scale = dist(0, 9); if (scale < 0.02) return;
             const dThumbIndex = dist(4, 8) / scale;
-            const dMiddle = dist(12, 0) / scale;
-            const dRing = dist(16, 0) / scale;
-            const dPinky = dist(20, 0) / scale;
+            const dMiddle = dist(12, 0) / scale; const dRing = dist(16, 0) / scale; const dPinky = dist(20, 0) / scale;
             const otherFingersExt = (dMiddle + dRing + dPinky) / 3;
-
             let detected = STATE.lastGesture;
-
-            if (otherFingersExt < 1.0) {
-                detected = 'FIST';
-            } else {
+            if (otherFingersExt < 1.0) { detected = 'FIST'; } 
+            else {
                 const pinchThreshold = STATE.isPinching ? 0.40 : 0.20;
-                if (dThumbIndex < pinchThreshold) {
-                    detected = 'PINCH';
-                } else {
-                    detected = 'OPEN';
-                }
+                if (dThumbIndex < pinchThreshold) { detected = 'PINCH'; } else { detected = 'OPEN'; }
             }
-
-            if (detected === STATE.lastGesture) {
-                STATE.gestureFrameCount++;
-            } else {
-                STATE.gestureFrameCount = 0;
-                STATE.lastGesture = detected;
-            }
-
-            if (STATE.gestureFrameCount > 3) {
-                executeState(detected);
-            }
+            if (detected === STATE.lastGesture) { STATE.gestureFrameCount++; } 
+            else { STATE.gestureFrameCount = 0; STATE.lastGesture = detected; }
+            if (STATE.gestureFrameCount > 3) { executeState(detected); }
         };
 
         const executeState = (gesture) => {
@@ -657,34 +652,40 @@
                 STATE.isPinching = true;
                 if (STATE.mode !== 'TREE') {
                     raycaster.setFromCamera(STATE.handPosition, camera); 
-                    
                     const intersects = raycaster.intersectObjects(photoGroups, true); 
-                    
                     if (intersects.length > 0) {
                         let target = intersects[0].object;
-                        while(target.parent && !photoMeshes.includes(target)) {
-                            target = target.parent;
-                        }
+                        while(target.parent && !photoMeshes.includes(target)) { target = target.parent; }
                         if (photoMeshes.includes(target)) {
-                            focusedPhoto = target;
+                            if (focusedPhoto !== target) {
+                                if (focusedPhoto && focusedPhoto.userData.video) focusedPhoto.userData.video.muted = true;
+                                focusedPhoto = target;
+                                if (focusedPhoto.userData.video) {
+                                    focusedPhoto.userData.video.muted = false;
+                                    focusedPhoto.userData.video.play().catch(e => {
+                                        console.warn("Autoplay blocked, playing muted", e);
+                                        focusedPhoto.userData.video.muted = true;
+                                        focusedPhoto.userData.video.play();
+                                    });
+                                }
+                            }
                             STATE.mode = 'FOCUS';
                         }
                     }
                 }
                 updateFeedback("PINCH: GRAB MEMORY", "red");
             } else if (gesture === 'FIST') {
-                STATE.isPinching = false;
-                STATE.mode = 'TREE';
+                STATE.isPinching = false; STATE.mode = 'TREE';
+                if(focusedPhoto && focusedPhoto.userData.video) focusedPhoto.userData.video.muted = true;
                 focusedPhoto = null;
                 updateFeedback("FIST: ASSEMBLE", "green");
             } else if (gesture === 'OPEN') {
                 STATE.isPinching = false;
                 if (STATE.mode === 'FOCUS') {
                     STATE.mode = 'EXPLODE';
+                    if(focusedPhoto && focusedPhoto.userData.video) focusedPhoto.userData.video.muted = true;
                     focusedPhoto = null;
-                } else if (STATE.mode === 'TREE') {
-                    STATE.mode = 'EXPLODE';
-                }
+                } else if (STATE.mode === 'TREE') { STATE.mode = 'EXPLODE'; }
                 updateFeedback("OPEN: CHAOS MODE", "yellow");
             }
         };
@@ -701,27 +702,27 @@
         };
 
         document.getElementById('photo-upload').addEventListener('change', (e) => {
-            const files = e.target.files;
-            if(!files.length) return;
-            
-            photoMeshes.forEach(m => scene.remove(m));
-            photoMeshes = [];
-            photoGroups = [];
-            
+            const files = e.target.files; if(!files.length) return;
+            photoMeshes.forEach(m => scene.remove(m)); photoMeshes = []; photoGroups = [];
             Array.from(files).forEach((file, i) => {
                 const url = URL.createObjectURL(file);
-                
-                loader.load(url, (texture) => {
-                    texture.colorSpace = THREE.SRGBColorSpace; 
-                    createPhoto(texture, i);
-                    URL.revokeObjectURL(url);
-                }, undefined, (err) => {
-                    console.error('Error loading image', err);
-                });
+                if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = url; video.loop = true; video.muted = true; video.playsInline = true; video.crossOrigin = "anonymous";
+                    video.onloadedmetadata = () => {
+                        const texture = new THREE.VideoTexture(video); texture.colorSpace = THREE.SRGBColorSpace;
+                        createPhoto(texture, i, video); video.play();
+                    };
+                    video.load();
+                } else {
+                    loader.load(url, (texture) => {
+                        texture.colorSpace = THREE.SRGBColorSpace; createPhoto(texture, i); URL.revokeObjectURL(url);
+                    }, undefined, (err) => console.error('Error loading image', err));
+                }
             });
         });
 
         init();
     </script>
 </body>
-</html><!-- 重新部署 -->
+</html>
