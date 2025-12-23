@@ -59,14 +59,14 @@
 
         h1 {
             font-family: 'Cinzel', serif;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8); /* 改为白色光晕 */
+            color: #ffffff; /* 改为白色文字 */
         }
 
         .glass-panel {
-            background: rgba(10, 20, 15, 0.75);
+            background: rgba(20, 25, 30, 0.65); /*稍微冷一点的底色*/
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
         }
         
@@ -78,7 +78,7 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
         }
     </style>
 </head>
@@ -96,51 +96,51 @@
         <!-- Header -->
         <div class="flex justify-between items-start">
             <div class="glass-panel p-6 rounded-xl max-w-md transition-all duration-700 transform translate-y-0 opacity-100" id="intro-panel">
-                <h1 class="text-3xl text-yellow-400 mb-2 font-bold tracking-widest">Merry Christmas</h1>
-                <p class="text-gray-300 text-xs mb-6 leading-relaxed border-l-2 border-yellow-600 pl-3">
+                <h1 class="text-3xl text-white mb-2 font-bold tracking-widest">Merry Christmas</h1>
+                <p class="text-gray-300 text-xs mb-6 leading-relaxed border-l-2 border-white pl-3">
                     请开启摄像头，用手势掌控魔法
                 </p>
                 
                 <div class="space-y-4">
                     <div class="flex items-center gap-4">
-                        <div class="instruction-icon bg-green-900/40 text-green-400 border-green-500/30">
+                        <div class="instruction-icon bg-gray-800/50 text-white border-white/30">
                             ✊
                         </div>
                         <div>
-                            <p class="text-green-100 text-sm font-bold uppercase tracking-wide">握拳 (Fist)</p>
-                            <p class="text-gray-400 text-xs">聚合圣诞树</p>
+                            <p class="text-white text-sm font-bold uppercase tracking-wide">握拳 (Fist)</p>
+                            <p class="text-gray-400 text-xs">聚合水晶树</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
-                        <div class="instruction-icon bg-yellow-900/40 text-yellow-400 border-yellow-500/30">
+                        <div class="instruction-icon bg-blue-900/40 text-blue-200 border-blue-400/30">
                             🖐
                         </div>
                         <div>
-                            <p class="text-yellow-100 text-sm font-bold uppercase tracking-wide">张开手 (Open)</p>
+                            <p class="text-blue-100 text-sm font-bold uppercase tracking-wide">张开手 (Open)</p>
                             <p class="text-gray-400 text-xs">炸开粒子 / 移动视角</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
-                        <div class="instruction-icon bg-red-900/40 text-red-400 border-red-500/30">
+                        <div class="instruction-icon bg-white/10 text-white border-white/30">
                             👌
                         </div>
                         <div>
-                            <p class="text-red-100 text-sm font-bold uppercase tracking-wide">捏合 (Pinch)</p>
+                            <p class="text-white text-sm font-bold uppercase tracking-wide">捏合 (Pinch)</p>
                             <p class="text-gray-400 text-xs">抓取</p>
                         </div>
                     </div>
                 </div>
 
-                <button id="start-btn" class="ui-element mt-8 w-full py-3 bg-gradient-to-r from-yellow-700 to-yellow-900 hover:from-yellow-600 hover:to-yellow-800 text-white font-serif tracking-widest text-sm uppercase rounded shadow-lg shadow-black/50 transition-all border border-yellow-600/30">
+                <button id="start-btn" class="ui-element mt-8 w-full py-3 bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-600 hover:to-gray-800 text-white font-serif tracking-widest text-sm uppercase rounded shadow-lg shadow-white/10 transition-all border border-white/20">
                     开启体验
                 </button>
-                <p id="loading-text" class="hidden text-xs text-center mt-3 text-yellow-500 animate-pulse tracking-wide">正在校准传感器...</p>
+                <p id="loading-text" class="hidden text-xs text-center mt-3 text-blue-200 animate-pulse tracking-wide">正在校准传感器...</p>
             </div>
 
             <!-- Upload Control -->
             <div class="glass-panel p-4 rounded-full ui-element hover:bg-white/10 transition-all cursor-pointer group active:scale-95" onclick="document.getElementById('photo-upload').click()">
                 <div class="flex flex-col items-center justify-center w-12 h-12">
-                    <span class="text-2xl text-gray-400 group-hover:text-yellow-400 transition-colors">📷</span>
+                    <span class="text-2xl text-gray-400 group-hover:text-white transition-colors">📷</span>
                 </div>
                 <!-- 允许选择多个图片，支持 jpg, png, webp, mp4 -->
                 <input type="file" id="photo-upload" multiple accept="image/*, video/mp4, video/webm, video/ogg" class="hidden">
@@ -149,7 +149,7 @@
 
         <!-- Feedback HUD -->
         <div class="flex flex-col items-center mb-8 gap-2">
-            <div id="gesture-feedback" class="glass-panel px-10 py-3 rounded-full text-yellow-400 font-serif tracking-widest text-sm opacity-0 transition-opacity duration-300">
+            <div id="gesture-feedback" class="glass-panel px-10 py-3 rounded-full text-white font-serif tracking-widest text-sm opacity-0 transition-opacity duration-300">
                 SYSTEM STANDBY
             </div>
             <p class="text-xs text-gray-500 font-mono opacity-50 uppercase">Use Cursor to Aim</p>
@@ -168,7 +168,7 @@
             particleCount: 1600,
             colors: {
                 green: 0x2F4F4F,
-                gold: 0xFFD700,
+                crystal: 0xFFFFFF, // Changed to White Crystal
                 red: 0xB22222,
                 white: 0xFFFFFF
             },
@@ -225,7 +225,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
-            renderer.toneMappingExposure = 0.9; 
+            renderer.toneMappingExposure = 1.0; // Slightly brighter for crystal
             renderer.outputColorSpace = THREE.SRGBColorSpace;
             
             maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -234,27 +234,29 @@
             // Post Processing
             const renderScene = new RenderPass(scene, camera);
             
-            // Bloom
+            // Bloom - Cool white bloom
             bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
             bloomPass.threshold = 0.85; 
-            bloomPass.strength = 1.5; 
-            bloomPass.radius = 0.5;
+            bloomPass.strength = 1.8; // Stronger bloom for crystal
+            bloomPass.radius = 0.6;
 
             composer = new EffectComposer(renderer);
             composer.addPass(renderScene);
             composer.addPass(bloomPass);
 
             // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.05);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
             scene.add(ambientLight);
             
-            const spotLight = new THREE.SpotLight(0xffd700, 2000);
+            // Cool White Spotlight (formerly Gold)
+            const spotLight = new THREE.SpotLight(0xffffff, 2000);
             spotLight.position.set(20, 50, 20);
             spotLight.decay = 2;
             spotLight.distance = 200;
             scene.add(spotLight);
             
-            const rimLight = new THREE.SpotLight(0x4455ff, 800);
+            // Blue Rim Light
+            const rimLight = new THREE.SpotLight(0x88ccff, 1000);
             rimLight.position.set(-20, 20, -20);
             scene.add(rimLight);
 
@@ -285,12 +287,13 @@
 
         // --- Particle System ---
         const createParticles = () => {
-            const matGold = new THREE.MeshStandardMaterial({ 
-                color: CONFIG.colors.gold, 
-                metalness: 1.0, 
-                roughness: 0.1, 
-                emissive: 0xffaa00,
-                emissiveIntensity: 3.0 
+            // White Crystal Material
+            const matCrystal = new THREE.MeshStandardMaterial({ 
+                color: 0xffffff, 
+                metalness: 0.9, 
+                roughness: 0.05, 
+                emissive: 0xffffff,
+                emissiveIntensity: 2.0 
             });
             
             const matGreen = new THREE.MeshStandardMaterial({ 
@@ -299,23 +302,24 @@
                 roughness: 0.8 
             });
             
+            // Keep red accents for contrast
             const matRed = new THREE.MeshStandardMaterial({ 
                 color: CONFIG.colors.red, 
                 metalness: 0.5, 
                 roughness: 0.2, 
                 emissive: 0xff0000,
-                emissiveIntensity: 4.0 
+                emissiveIntensity: 3.0 
             });
 
             const geomSphere = new THREE.SphereGeometry(0.35, 12, 12);
             const geomCube = new THREE.BoxGeometry(0.6, 0.6, 0.6);
             const geomCyl = new THREE.CylinderGeometry(0.1, 0.1, 1, 8);
             
-            const meshGold = new THREE.InstancedMesh(geomSphere, matGold, 400);
+            const meshCrystal = new THREE.InstancedMesh(geomSphere, matCrystal, 600); // More crystals
             const meshGreen = new THREE.InstancedMesh(geomCube, matGreen, 800);
-            const meshRed = new THREE.InstancedMesh(geomCyl, matRed, 400);
+            const meshRed = new THREE.InstancedMesh(geomCyl, matRed, 200);
 
-            scene.add(meshGold);
+            scene.add(meshCrystal);
             scene.add(meshGreen);
             scene.add(meshRed);
 
@@ -355,7 +359,7 @@
                 }
             };
 
-            distribute(meshGold, 'gold', 0);
+            distribute(meshCrystal, 'crystal', 0);
             distribute(meshGreen, 'green', 1);
             distribute(meshRed, 'red', 2);
         };
@@ -391,11 +395,11 @@
             pMesh.position.z = 0.08; 
             pMesh.name = "photo_surface"; 
             
-            // Frame Plane
+            // Frame Plane - White for Crystal Theme
             const fWidth = width + 1; 
             const fHeight = height + 2.5; 
             const fGeo = new THREE.PlaneGeometry(fWidth, fHeight);
-            const fMat = new THREE.MeshBasicMaterial({ color: 0xeeeeee, side: THREE.DoubleSide });
+            const fMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
             const fMesh = new THREE.Mesh(fGeo, fMat);
             
             pMesh.position.y = (fHeight - height) / 2 - 0.5;
@@ -403,8 +407,7 @@
             group.add(fMesh);
             group.add(pMesh);
 
-            // FIX: Restore tight distribution (cx=40, cy=30)
-            const cx = (Math.random() - 0.5) * 40; 
+            const cx = (Math.random() - 0.5) * 40;
             const cy = (Math.random() - 0.5) * 30;
             const cz = (Math.random() - 0.5) * 20;
 
@@ -479,7 +482,7 @@
         // --- Logic Update ---
         const updateState = (delta, time) => {
             
-            const targetBloomStrength = (STATE.mode === 'FOCUS') ? 0.0 : 1.5;
+            const targetBloomStrength = (STATE.mode === 'FOCUS') ? 0.0 : 1.8;
             bloomPass.strength += (targetBloomStrength - bloomPass.strength) * 4.0 * delta;
 
             const dummy = new THREE.Object3D();
@@ -521,7 +524,7 @@
                     }
 
                     if (STATE.mode === 'EXPLODE') {
-                        // FIX: Increase rotation factor from 0.5 to 2.0 for WIDER rotation range
+                        // Increase rotation factor
                         const targetRot = STATE.handPosition.x * 2.0; 
                         STATE.rotation += (targetRot - STATE.rotation) * 2.0 * delta;
                         
@@ -574,13 +577,11 @@
                     } else {
                         let target = group.userData.chaosPos.clone();
                         
-                        // Hover Logic
                         let scaleTarget = 1.0;
                         if (STATE.mode === 'FOCUS') {
                             scaleTarget = 0.5;
                         } else if (group === hoveredPhoto) {
                             scaleTarget = 1.2;
-                            // Pull slightly towards camera
                             const dir = camera.position.clone().sub(target).normalize();
                             target = target.clone().add(dir.multiplyScalar(5));
                         }
@@ -608,7 +609,6 @@
             composer.setSize(window.innerWidth, window.innerHeight);
         };
 
-        // --- MediaPipe Logic ---
         const videoElement = document.getElementById('input-video');
         const startBtn = document.getElementById('start-btn');
         const feedbackEl = document.getElementById('gesture-feedback');
