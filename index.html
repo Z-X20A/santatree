@@ -31,7 +31,7 @@
             font-family: 'Lato', sans-serif;
             color: #e2e8f0;
             user-select: none;
-            -webkit-tap-highlight-color: transparent; /* Remove mobile tap highlight */
+            -webkit-tap-highlight-color: transparent;
         }
 
         #canvas-container {
@@ -64,23 +64,21 @@
         }
 
         .glass-panel {
-            background: rgba(10, 20, 15, 0.65); /* More transparent for mobile */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            background: rgba(10, 20, 15, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
         }
         
         .instruction-icon {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 1.2rem;
             border: 1px solid rgba(255,255,255,0.1);
-            flex-shrink: 0;
         }
     </style>
 </head>
@@ -93,67 +91,68 @@
     <video id="input-video" style="display:none;" playsinline></video>
 
     <!-- UI Overlay -->
-    <div id="ui-layer" class="flex flex-col justify-between p-4 sm:p-6 safe-area-inset">
+    <div id="ui-layer" class="flex flex-col justify-between p-6">
         
         <!-- Header -->
-        <div class="flex justify-between items-start gap-2">
-            <div class="glass-panel p-4 sm:p-6 rounded-xl w-full max-w-sm transition-all duration-700 transform translate-y-0 opacity-100" id="intro-panel">
-                <h1 class="text-2xl sm:text-3xl text-yellow-400 mb-1 sm:mb-2 font-bold tracking-widest">Merry Christmas</h1>
-                <p class="text-gray-300 text-[10px] sm:text-xs mb-3 sm:mb-6 leading-relaxed border-l-2 border-yellow-600 pl-2 sm:pl-3">
+        <div class="flex justify-between items-start">
+            <div class="glass-panel p-6 rounded-xl max-w-md transition-all duration-700 transform translate-y-0 opacity-100" id="intro-panel">
+                <h1 class="text-3xl text-yellow-400 mb-2 font-bold tracking-widest">Merry Christmas</h1>
+                <p class="text-gray-300 text-xs mb-6 leading-relaxed border-l-2 border-yellow-600 pl-3">
                     请开启摄像头，用手势掌控魔法
                 </p>
                 
-                <div class="space-y-2 sm:space-y-4">
-                    <div class="flex items-center gap-3">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
                         <div class="instruction-icon bg-green-900/40 text-green-400 border-green-500/30">
                             ✊
                         </div>
                         <div>
-                            <p class="text-green-100 text-xs sm:text-sm font-bold uppercase tracking-wide">握拳 (Fist)</p>
-                            <p class="text-gray-400 text-[10px] sm:text-xs">聚合圣诞树</p>
+                            <p class="text-green-100 text-sm font-bold uppercase tracking-wide">握拳 (Fist)</p>
+                            <p class="text-gray-400 text-xs">聚合圣诞树</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-4">
                         <div class="instruction-icon bg-yellow-900/40 text-yellow-400 border-yellow-500/30">
                             🖐
                         </div>
                         <div>
-                            <p class="text-yellow-100 text-xs sm:text-sm font-bold uppercase tracking-wide">张开手 (Open)</p>
-                            <p class="text-gray-400 text-[10px] sm:text-xs">炸开粒子 / 移动视角</p>
+                            <p class="text-yellow-100 text-sm font-bold uppercase tracking-wide">张开手 (Open)</p>
+                            <p class="text-gray-400 text-xs">炸开粒子 / 移动视角</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-4">
                         <div class="instruction-icon bg-red-900/40 text-red-400 border-red-500/30">
                             👌
                         </div>
                         <div>
-                            <p class="text-red-100 text-xs sm:text-sm font-bold uppercase tracking-wide">捏合 (Pinch)</p>
-                            <p class="text-gray-400 text-[10px] sm:text-xs">抓取</p>
+                            <p class="text-red-100 text-sm font-bold uppercase tracking-wide">捏合 (Pinch)</p>
+                            <p class="text-gray-400 text-xs">抓取</p>
                         </div>
                     </div>
                 </div>
 
-                <button id="start-btn" class="ui-element mt-4 sm:mt-8 w-full py-2 sm:py-3 bg-gradient-to-r from-yellow-700 to-yellow-900 hover:from-yellow-600 hover:to-yellow-800 text-white font-serif tracking-widest text-xs sm:text-sm uppercase rounded shadow-lg shadow-black/50 transition-all border border-yellow-600/30">
+                <button id="start-btn" class="ui-element mt-8 w-full py-3 bg-gradient-to-r from-yellow-700 to-yellow-900 hover:from-yellow-600 hover:to-yellow-800 text-white font-serif tracking-widest text-sm uppercase rounded shadow-lg shadow-black/50 transition-all border border-yellow-600/30">
                     开启体验
                 </button>
-                <p id="loading-text" class="hidden text-[10px] text-center mt-2 sm:mt-3 text-yellow-500 animate-pulse tracking-wide">正在校准传感器...</p>
+                <p id="loading-text" class="hidden text-xs text-center mt-3 text-yellow-500 animate-pulse tracking-wide">正在校准传感器...</p>
             </div>
 
-            <!-- Upload Control - Compact on Mobile -->
-            <div class="glass-panel p-3 rounded-full ui-element hover:bg-white/10 transition-all cursor-pointer group active:scale-95 flex-shrink-0" onclick="document.getElementById('photo-upload').click()">
-                <div class="flex flex-col items-center justify-center w-8 h-8 sm:w-12 sm:h-12">
-                    <span class="text-xl sm:text-2xl text-gray-400 group-hover:text-yellow-400 transition-colors">📷</span>
+            <!-- Upload Control -->
+            <div class="glass-panel p-4 rounded-full ui-element hover:bg-white/10 transition-all cursor-pointer group active:scale-95" onclick="document.getElementById('photo-upload').click()">
+                <div class="flex flex-col items-center justify-center w-12 h-12">
+                    <span class="text-2xl text-gray-400 group-hover:text-yellow-400 transition-colors">📷</span>
                 </div>
+                <!-- 允许选择多个图片，支持 jpg, png, webp, mp4 -->
                 <input type="file" id="photo-upload" multiple accept="image/*, video/mp4, video/webm, video/ogg" class="hidden">
             </div>
         </div>
 
-        <!-- Feedback HUD - Moved up slightly for mobile nav bars -->
-        <div class="flex flex-col items-center mb-4 sm:mb-8 gap-2 pointer-events-none">
-            <div id="gesture-feedback" class="glass-panel px-6 py-2 sm:px-10 sm:py-3 rounded-full text-yellow-400 font-serif tracking-widest text-xs sm:text-sm opacity-0 transition-opacity duration-300 whitespace-nowrap">
+        <!-- Feedback HUD -->
+        <div class="flex flex-col items-center mb-8 gap-2">
+            <div id="gesture-feedback" class="glass-panel px-10 py-3 rounded-full text-yellow-400 font-serif tracking-widest text-sm opacity-0 transition-opacity duration-300">
                 SYSTEM STANDBY
             </div>
-            <p class="text-[10px] sm:text-xs text-gray-500 font-mono opacity-50 uppercase">Use Cursor to Aim</p>
+            <p class="text-xs text-gray-500 font-mono opacity-50 uppercase">Use Cursor to Aim</p>
         </div>
     </div>
 
@@ -175,7 +174,7 @@
             },
             treeHeight: 35,
             treeRadius: 14,
-            camZ: 45 // Base Z distance
+            camZ: 45
         };
 
         // --- State Management ---
@@ -213,9 +212,9 @@
             scene.fog = new THREE.FogExp2(0x050505, 0.015);
             scene.background = new THREE.Color(0x050505);
 
-            // Camera - Initial Setup
+            // Camera
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            updateCameraPosition(); // Fix for portrait mode
+            camera.position.set(0, 0, CONFIG.camZ);
 
             // Renderer
             renderer = new THREE.WebGLRenderer({ 
@@ -224,7 +223,6 @@
                 logarithmicDepthBuffer: true
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            // Cap pixel ratio at 2 for mobile performance
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             renderer.toneMapping = THREE.ACESFilmicToneMapping;
             renderer.toneMappingExposure = 0.9; 
@@ -235,6 +233,8 @@
 
             // Post Processing
             const renderScene = new RenderPass(scene, camera);
+            
+            // Bloom
             bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
             bloomPass.threshold = 0.85; 
             bloomPass.strength = 1.5; 
@@ -287,14 +287,24 @@
         const createParticles = () => {
             const matGold = new THREE.MeshStandardMaterial({ 
                 color: CONFIG.colors.gold, 
-                metalness: 1.0, roughness: 0.1, 
-                emissive: 0xffaa00, emissiveIntensity: 3.0 
+                metalness: 1.0, 
+                roughness: 0.1, 
+                emissive: 0xffaa00,
+                emissiveIntensity: 3.0 
             });
-            const matGreen = new THREE.MeshStandardMaterial({ color: CONFIG.colors.green, metalness: 0.2, roughness: 0.8 });
+            
+            const matGreen = new THREE.MeshStandardMaterial({ 
+                color: CONFIG.colors.green, 
+                metalness: 0.2, 
+                roughness: 0.8 
+            });
+            
             const matRed = new THREE.MeshStandardMaterial({ 
                 color: CONFIG.colors.red, 
-                metalness: 0.5, roughness: 0.2, 
-                emissive: 0xff0000, emissiveIntensity: 4.0 
+                metalness: 0.5, 
+                roughness: 0.2, 
+                emissive: 0xff0000,
+                emissiveIntensity: 4.0 
             });
 
             const geomSphere = new THREE.SphereGeometry(0.35, 12, 12);
@@ -305,16 +315,20 @@
             const meshGreen = new THREE.InstancedMesh(geomCube, matGreen, 800);
             const meshRed = new THREE.InstancedMesh(geomCyl, matRed, 400);
 
-            scene.add(meshGold); scene.add(meshGreen); scene.add(meshRed);
+            scene.add(meshGold);
+            scene.add(meshGreen);
+            scene.add(meshRed);
 
             const distribute = (mesh, type, offsetIndex) => {
                 const count = mesh.count;
                 const dummy = new THREE.Object3D();
+
                 for (let i = 0; i < count; i++) {
                     const t = i / count;
                     const y = -12 + t * CONFIG.treeHeight;
                     const radius = (1 - t) * CONFIG.treeRadius;
                     const angle = i * 2.399 + offsetIndex;
+                    
                     const tx = Math.cos(angle) * radius + (Math.random()-0.5);
                     const tz = Math.sin(angle) * radius + (Math.random()-0.5);
                     const cx = (Math.random() - 0.5) * 60;
@@ -328,48 +342,71 @@
                     mesh.setMatrixAt(i, dummy.matrix);
 
                     particles.push({
-                        mesh: mesh, index: i,
+                        mesh: mesh,
+                        index: i,
                         treePos: new THREE.Vector3(tx, y, tz),
                         chaosPos: new THREE.Vector3(cx, cy, cz),
                         currentPos: new THREE.Vector3(tx, y, tz),
-                        wobbleOffset: Math.random() * 100, wobbleSpeed: Math.random() * 0.5 + 0.5,
-                        baseScale: dummy.scale.clone(), baseRotation: dummy.rotation.clone(),
+                        wobbleOffset: Math.random() * 100,
+                        wobbleSpeed: Math.random() * 0.5 + 0.5,
+                        baseScale: dummy.scale.clone(),
+                        baseRotation: dummy.rotation.clone(),
                     });
                 }
             };
-            distribute(meshGold, 'gold', 0); distribute(meshGreen, 'green', 1); distribute(meshRed, 'red', 2);
+
+            distribute(meshGold, 'gold', 0);
+            distribute(meshGreen, 'green', 1);
+            distribute(meshRed, 'red', 2);
         };
 
         // --- Photo/Video System ---
         const createPhoto = (texture, index, videoElement = null) => {
             const group = new THREE.Group();
+            
             texture.anisotropy = maxAnisotropy;
-            texture.minFilter = THREE.LinearFilter; texture.magFilter = THREE.LinearFilter;
+            texture.minFilter = THREE.LinearFilter; 
+            texture.magFilter = THREE.LinearFilter;
             
             let aspect = 0.8;
-            if (videoElement && videoElement.videoWidth) aspect = videoElement.videoWidth / videoElement.videoHeight;
-            else if (texture.image && texture.image.width) aspect = texture.image.width / texture.image.height;
+            if (videoElement) {
+                if(videoElement.videoWidth) aspect = videoElement.videoWidth / videoElement.videoHeight;
+            } else if (texture.image && texture.image.width) {
+                aspect = texture.image.width / texture.image.height;
+            }
             
-            const width = 5; const height = width / aspect;
+            const width = 5;
+            const height = width / aspect;
+
             const pGeo = new THREE.PlaneGeometry(width, height);
             const pMat = new THREE.MeshBasicMaterial({ 
-                map: texture, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1
+                map: texture, 
+                side: THREE.DoubleSide,
+                polygonOffset: true,
+                polygonOffsetFactor: -1,
+                polygonOffsetUnits: -1
             });
             const pMesh = new THREE.Mesh(pGeo, pMat);
-            pMesh.position.z = 0.08; pMesh.name = "photo_surface"; 
             
-            const fWidth = width + 1; const fHeight = height + 2.5; 
+            pMesh.position.z = 0.08; 
+            pMesh.name = "photo_surface"; 
+            
+            // Frame Plane
+            const fWidth = width + 1; 
+            const fHeight = height + 2.5; 
             const fGeo = new THREE.PlaneGeometry(fWidth, fHeight);
             const fMat = new THREE.MeshBasicMaterial({ color: 0xeeeeee, side: THREE.DoubleSide });
             const fMesh = new THREE.Mesh(fGeo, fMat);
+            
             pMesh.position.y = (fHeight - height) / 2 - 0.5;
 
-            group.add(fMesh); group.add(pMesh);
+            group.add(fMesh);
+            group.add(pMesh);
 
-            // FIX: Even wider distribution for mobile clarity
-            const cx = (Math.random() - 0.5) * 80; 
-            const cy = (Math.random() - 0.5) * 80; // Taller spread
-            const cz = (Math.random() - 0.5) * 50;
+            // FIX: Restore tight distribution (cx=40, cy=30)
+            const cx = (Math.random() - 0.5) * 40; 
+            const cy = (Math.random() - 0.5) * 30;
+            const cz = (Math.random() - 0.5) * 20;
 
             group.userData = {
                 chaosPos: new THREE.Vector3(cx, cy, cz),
@@ -377,8 +414,12 @@
                 velocity: new THREE.Vector3((Math.random()-0.5)*0.02, (Math.random()-0.5)*0.02, 0),
                 video: videoElement 
             };
+            
             group.scale.set(0,0,0);
-            scene.add(group); photoMeshes.push(group); photoGroups.push(group);
+            
+            scene.add(group);
+            photoMeshes.push(group);
+            photoGroups.push(group);
         };
 
         const createDefaultPhotos = () => {
@@ -394,67 +435,98 @@
             defaultContent.forEach((item, i) => {
                 if (item.type === 'video') {
                     const video = document.createElement('video');
-                    video.src = item.url; video.loop = true; video.muted = true; video.playsInline = true; video.crossOrigin = "anonymous";
+                    video.src = item.url;
+                    video.loop = true;
+                    video.muted = true; 
+                    video.playsInline = true;
+                    video.crossOrigin = "anonymous";
                     video.play().catch(e => console.log("Auto-play prevented"));
+
                     video.onloadedmetadata = () => {
-                        const texture = new THREE.VideoTexture(video); texture.colorSpace = THREE.SRGBColorSpace;
+                        const texture = new THREE.VideoTexture(video);
+                        texture.colorSpace = THREE.SRGBColorSpace;
                         createPhoto(texture, i, video);
                     };
-                    video.onerror = () => createFallbackCard(i, "Video Error");
+                    video.onerror = () => {
+                        console.warn("Video failed to load");
+                        createFallbackCard(i, "Video Error");
+                    }
                 } else {
                     loader.load(item.url, (tex) => {
-                        tex.colorSpace = THREE.SRGBColorSpace; createPhoto(tex, i);
-                    }, undefined, () => createFallbackCard(i, "Noel"));
+                        tex.colorSpace = THREE.SRGBColorSpace;
+                        createPhoto(tex, i);
+                    }, undefined, () => {
+                        createFallbackCard(i, "Noel");
+                    });
                 }
             });
         };
 
         const createFallbackCard = (index, text) => {
-            const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 512;
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#C41E3A'; ctx.fillRect(0,0,512,512);
-            ctx.fillStyle = '#fff'; ctx.font = '60px Arial'; ctx.textAlign = 'center'; ctx.fillText(text, 256, 256);
-            const t = new THREE.CanvasTexture(canvas); t.colorSpace = THREE.SRGBColorSpace; createPhoto(t, index);
+            ctx.fillStyle = '#fff'; 
+            ctx.font = '60px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 256, 256);
+            const t = new THREE.CanvasTexture(canvas);
+            t.colorSpace = THREE.SRGBColorSpace;
+            createPhoto(t, index);
         };
 
         // --- Logic Update ---
         const updateState = (delta, time) => {
+            
             const targetBloomStrength = (STATE.mode === 'FOCUS') ? 0.0 : 1.5;
             bloomPass.strength += (targetBloomStrength - bloomPass.strength) * 4.0 * delta;
+
             const dummy = new THREE.Object3D();
             
-            hoveredPhoto = null;
-
+            // 1. Cursor & Camera
             if (STATE.mode === 'EXPLODE' || STATE.mode === 'FOCUS') {
                 if (STATE.handDetected) {
                     raycaster.setFromCamera(STATE.handPosition, camera);
+                    
                     const cursorDist = 20;
-                    const cursorPos = new THREE.Vector3().copy(raycaster.ray.direction).multiplyScalar(cursorDist).add(raycaster.ray.origin);
+                    const cursorPos = new THREE.Vector3()
+                        .copy(raycaster.ray.direction)
+                        .multiplyScalar(cursorDist)
+                        .add(raycaster.ray.origin);
+                        
                     cursorMesh.position.copy(cursorPos);
                     cursorMesh.lookAt(camera.position);
                     cursorMesh.visible = true;
 
+                    // Check hover
+                    hoveredPhoto = null;
                     const intersects = raycaster.intersectObjects(photoGroups, true); 
                     if (intersects.length > 0) {
                         let target = intersects[0].object;
-                        while(target.parent && !photoMeshes.includes(target)) { target = target.parent; }
-                        if (photoMeshes.includes(target)) { hoveredPhoto = target; }
+                        while(target.parent && !photoMeshes.includes(target)) {
+                            target = target.parent;
+                        }
+                        if (photoMeshes.includes(target)) {
+                            hoveredPhoto = target;
+                        }
                     }
 
                     if (STATE.isPinching) {
-                        cursorMesh.scale.set(0.5, 0.5, 0.5); cursorMesh.material.color.set(0xff0000);
+                        cursorMesh.scale.set(0.5, 0.5, 0.5);
+                        cursorMesh.material.color.set(0xff0000);
                     } else {
-                        cursorMesh.scale.set(1, 1, 1); cursorMesh.material.color.set(0xffffff);
+                        cursorMesh.scale.set(1, 1, 1);
+                        cursorMesh.material.color.set(0xffffff);
                     }
 
                     if (STATE.mode === 'EXPLODE') {
-                        const targetRot = STATE.handPosition.x * 0.5; 
+                        // FIX: Increase rotation factor from 0.5 to 2.0 for WIDER rotation range
+                        const targetRot = STATE.handPosition.x * 2.0; 
                         STATE.rotation += (targetRot - STATE.rotation) * 2.0 * delta;
                         
-                        // Adaptive camera orbit for portrait
-                        const camDist = getResponsiveCamZ();
-                        camera.position.x = Math.sin(STATE.rotation) * camDist;
-                        camera.position.z = Math.cos(STATE.rotation) * camDist;
+                        camera.position.x = Math.sin(STATE.rotation) * CONFIG.camZ;
+                        camera.position.z = Math.cos(STATE.rotation) * CONFIG.camZ;
                         camera.lookAt(0, 0, 0);
                     }
                 } else {
@@ -462,9 +534,8 @@
                 }
             } else {
                 STATE.rotation += delta * 0.2;
-                const camDist = getResponsiveCamZ();
-                camera.position.x = Math.sin(STATE.rotation) * camDist;
-                camera.position.z = Math.cos(STATE.rotation) * camDist;
+                camera.position.x = Math.sin(STATE.rotation) * CONFIG.camZ;
+                camera.position.z = Math.cos(STATE.rotation) * CONFIG.camZ;
                 camera.lookAt(0, 5, 0);
                 cursorMesh.visible = false;
             }
@@ -489,7 +560,10 @@
                 if (STATE.mode === 'TREE') {
                     group.scale.lerp(new THREE.Vector3(0,0,0), lerpSpeed);
                     group.position.lerp(group.userData.treePos, lerpSpeed);
-                    if(group.userData.video) { group.userData.video.muted = true; group.userData.video.play(); }
+                    if(group.userData.video) {
+                        group.userData.video.muted = true; 
+                        group.userData.video.play(); 
+                    }
                 } else {
                     group.visible = true;
                     if (STATE.mode === 'FOCUS' && group === focusedPhoto) {
@@ -499,14 +573,18 @@
                         group.scale.lerp(new THREE.Vector3(1.5, 1.5, 1.5), lerpSpeed);
                     } else {
                         let target = group.userData.chaosPos.clone();
+                        
+                        // Hover Logic
                         let scaleTarget = 1.0;
                         if (STATE.mode === 'FOCUS') {
                             scaleTarget = 0.5;
                         } else if (group === hoveredPhoto) {
-                            scaleTarget = 1.15;
-                            const dirToCam = camera.position.clone().sub(target).normalize();
-                            target.add(dirToCam.multiplyScalar(2));
+                            scaleTarget = 1.2;
+                            // Pull slightly towards camera
+                            const dir = camera.position.clone().sub(target).normalize();
+                            target = target.clone().add(dir.multiplyScalar(5));
                         }
+
                         group.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), lerpSpeed);
                         target.y += Math.sin(time + group.id) * 0.5;
                         group.position.lerp(target, lerpSpeed);
@@ -523,26 +601,9 @@
             composer.render();
         };
 
-        // --- Helper for Responsive Camera ---
-        const getResponsiveCamZ = () => {
-            const aspect = window.innerWidth / window.innerHeight;
-            // If portrait (aspect < 1), move camera back to fit width
-            if (aspect < 1.0) {
-                return CONFIG.camZ / aspect * 0.8; // 0.8 factor to tune the fit
-            }
-            return CONFIG.camZ;
-        };
-
-        const updateCameraPosition = () => {
+        const onWindowResize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-            const z = getResponsiveCamZ();
-            // Smoothly move if running, set instantly if init
-            camera.position.z = z;
-        };
-
-        const onWindowResize = () => {
-            updateCameraPosition();
             renderer.setSize(window.innerWidth, window.innerHeight);
             composer.setSize(window.innerWidth, window.innerHeight);
         };
@@ -559,7 +620,12 @@
             loadingText.classList.remove('hidden');
 
             const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-            hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+            hands.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.6,
+                minTrackingConfidence: 0.6
+            });
             hands.onResults(onHandsResults);
 
             const cameraUtils = new Camera(videoElement, {
@@ -583,26 +649,52 @@
                 STATE.handPosition.x = ndcX; STATE.handPosition.y = ndcY;
                 processGesture(lm);
             } else {
-                STATE.handDetected = false; STATE.gestureFrameCount = 0; STATE.isPinching = false;
+                STATE.handDetected = false;
+                STATE.gestureFrameCount = 0;
+                STATE.isPinching = false;
                 updateFeedback("SEARCHING HAND...", "gray");
             }
         };
 
         const processGesture = (lm) => {
-            const dist = (i, j) => Math.sqrt(Math.pow(lm[i].x - lm[j].x, 2) + Math.pow(lm[i].y - lm[j].y, 2) + Math.pow(lm[i].z - lm[j].z, 2));
-            const scale = dist(0, 9); if (scale < 0.02) return;
+            const dist = (i, j) => Math.sqrt(
+                Math.pow(lm[i].x - lm[j].x, 2) + 
+                Math.pow(lm[i].y - lm[j].y, 2) + 
+                Math.pow(lm[i].z - lm[j].z, 2)
+            );
+
+            const scale = dist(0, 9);
+            if (scale < 0.02) return;
+
             const dThumbIndex = dist(4, 8) / scale;
-            const dMiddle = dist(12, 0) / scale; const dRing = dist(16, 0) / scale; const dPinky = dist(20, 0) / scale;
+            const dMiddle = dist(12, 0) / scale;
+            const dRing = dist(16, 0) / scale;
+            const dPinky = dist(20, 0) / scale;
             const otherFingersExt = (dMiddle + dRing + dPinky) / 3;
+
             let detected = STATE.lastGesture;
-            if (otherFingersExt < 1.0) { detected = 'FIST'; } 
-            else {
+
+            if (otherFingersExt < 1.0) {
+                detected = 'FIST';
+            } else {
                 const pinchThreshold = STATE.isPinching ? 0.40 : 0.20;
-                if (dThumbIndex < pinchThreshold) { detected = 'PINCH'; } else { detected = 'OPEN'; }
+                if (dThumbIndex < pinchThreshold) {
+                    detected = 'PINCH';
+                } else {
+                    detected = 'OPEN';
+                }
             }
-            if (detected === STATE.lastGesture) { STATE.gestureFrameCount++; } 
-            else { STATE.gestureFrameCount = 0; STATE.lastGesture = detected; }
-            if (STATE.gestureFrameCount > 3) { executeState(detected); }
+
+            if (detected === STATE.lastGesture) {
+                STATE.gestureFrameCount++;
+            } else {
+                STATE.gestureFrameCount = 0;
+                STATE.lastGesture = detected;
+            }
+
+            if (STATE.gestureFrameCount > 3) {
+                executeState(detected);
+            }
         };
 
         const executeState = (gesture) => {
@@ -628,7 +720,8 @@
                 }
                 updateFeedback("PINCH: GRAB MEMORY", "red");
             } else if (gesture === 'FIST') {
-                STATE.isPinching = false; STATE.mode = 'TREE';
+                STATE.isPinching = false;
+                STATE.mode = 'TREE';
                 if(focusedPhoto && focusedPhoto.userData.video) focusedPhoto.userData.video.muted = true;
                 focusedPhoto = null;
                 updateFeedback("FIST: ASSEMBLE", "green");
@@ -638,7 +731,9 @@
                     STATE.mode = 'EXPLODE';
                     if(focusedPhoto && focusedPhoto.userData.video) focusedPhoto.userData.video.muted = true;
                     focusedPhoto = null;
-                } else if (STATE.mode === 'TREE') { STATE.mode = 'EXPLODE'; }
+                } else if (STATE.mode === 'TREE') {
+                    STATE.mode = 'EXPLODE';
+                }
                 updateFeedback("OPEN: CHAOS MODE", "yellow");
             }
         };
@@ -651,12 +746,17 @@
                 gray: "text-gray-400 border-gray-500/20 shadow-none"
             };
             feedbackEl.textContent = text;
-            feedbackEl.className = `glass-panel px-6 py-2 sm:px-10 sm:py-3 rounded-full font-serif tracking-widest text-xs sm:text-sm transition-all duration-300 border shadow-lg ${colors[colorKey]}`;
+            feedbackEl.className = `glass-panel px-10 py-3 rounded-full font-serif tracking-widest text-sm transition-all duration-300 border shadow-lg ${colors[colorKey]}`;
         };
 
         document.getElementById('photo-upload').addEventListener('change', (e) => {
-            const files = e.target.files; if(!files.length) return;
-            photoMeshes.forEach(m => scene.remove(m)); photoMeshes = []; photoGroups = [];
+            const files = e.target.files;
+            if(!files.length) return;
+            
+            photoMeshes.forEach(m => scene.remove(m));
+            photoMeshes = [];
+            photoGroups = [];
+            
             Array.from(files).forEach((file, i) => {
                 const url = URL.createObjectURL(file);
                 if (file.type.startsWith('video/')) {
@@ -669,8 +769,12 @@
                     video.load();
                 } else {
                     loader.load(url, (texture) => {
-                        texture.colorSpace = THREE.SRGBColorSpace; createPhoto(texture, i); URL.revokeObjectURL(url);
-                    }, undefined, (err) => console.error('Error loading image', err));
+                        texture.colorSpace = THREE.SRGBColorSpace; 
+                        createPhoto(texture, i);
+                        URL.revokeObjectURL(url);
+                    }, undefined, (err) => {
+                        console.error('Error loading image', err);
+                    });
                 }
             });
         });
