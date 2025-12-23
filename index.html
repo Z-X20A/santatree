@@ -125,7 +125,7 @@
                         </div>
                         <div>
                             <p class="text-red-100 text-sm font-bold uppercase tracking-wide">捏合 (Pinch)</p>
-                            <p class="text-gray-400 text-xs">抓取</p>
+                            <p class="text-gray-400 text-xs">瞄准高亮，捏合抓取</p>
                         </div>
                     </div>
                 </div>
@@ -197,6 +197,7 @@
         let clock = new THREE.Clock();
         let raycaster = new THREE.Raycaster();
         let focusedPhoto = null;
+        let hoveredPhoto = null; // New: Track hovered photo
         let photoGroups = [];
         let loader = new THREE.TextureLoader();
         let maxAnisotropy = 1;
@@ -401,15 +402,17 @@
             group.add(fMesh);
             group.add(pMesh);
 
-            const cx = (Math.random() - 0.5) * 40;
-            const cy = (Math.random() - 0.5) * 30;
-            const cz = (Math.random() - 0.5) * 20;
+            // FIX: WIDER DISTRIBUTION to prevent overlap
+            const cx = (Math.random() - 0.5) * 100; // Increased from 40
+            const cy = (Math.random() - 0.5) * 60;  // Increased from 30
+            const cz = (Math.random() - 0.5) * 60;  // Increased from 20
 
             group.userData = {
                 chaosPos: new THREE.Vector3(cx, cy, cz),
                 treePos: new THREE.Vector3(0, 15, 0),
                 velocity: new THREE.Vector3((Math.random()-0.5)*0.02, (Math.random()-0.5)*0.02, 0),
-                video: videoElement 
+                video: videoElement,
+                hovered: false 
             };
             
             group.scale.set(0,0,0);
@@ -421,7 +424,6 @@
 
         const createDefaultPhotos = () => {
             const defaultContent = [
-                // 默认图片
                 { type: 'image', url: './3bd9c41b6ec25b00526d612af704615e.jpg' },
                 { type: 'image', url: './508a188f8d2c0f8d17d312e3f923b294.jpg' },
                 { type: 'image', url: './3937903cff4c216da2d7b8e10e09bebb.jpg' },
@@ -482,6 +484,9 @@
 
             const dummy = new THREE.Object3D();
             
+            // 1. Cursor & Raycast Logic (REALTIME HOVER)
+            hoveredPhoto = null; // Reset hover every frame
+
             if (STATE.mode === 'EXPLODE' || STATE.mode === 'FOCUS') {
                 if (STATE.handDetected) {
                     raycaster.setFromCamera(STATE.handPosition, camera);
@@ -495,6 +500,18 @@
                     cursorMesh.position.copy(cursorPos);
                     cursorMesh.lookAt(camera.position);
                     cursorMesh.visible = true;
+
+                    // FIX: Realtime Raycast for Hover Effect
+                    const intersects = raycaster.intersectObjects(photoGroups, true); 
+                    if (intersects.length > 0) {
+                        let target = intersects[0].object;
+                        while(target.parent && !photoMeshes.includes(target)) {
+                            target = target.parent;
+                        }
+                        if (photoMeshes.includes(target)) {
+                            hoveredPhoto = target;
+                        }
+                    }
 
                     if (STATE.isPinching) {
                         cursorMesh.scale.set(0.5, 0.5, 0.5);
@@ -523,6 +540,7 @@
                 cursorMesh.visible = false;
             }
 
+            // 2. Particles
             const lerpSpeed = 4.0 * delta;
             particles.forEach(p => {
                 let target = (STATE.mode === 'TREE') ? p.treePos : p.chaosPos;
@@ -539,6 +557,7 @@
             });
             scene.children.filter(c => c.isInstancedMesh).forEach(m => m.instanceMatrix.needsUpdate = true);
 
+            // 3. Photos
             photoMeshes.forEach(group => {
                 if (STATE.mode === 'TREE') {
                     group.scale.lerp(new THREE.Vector3(0,0,0), lerpSpeed);
@@ -555,13 +574,23 @@
                         group.lookAt(camera.position);
                         group.scale.lerp(new THREE.Vector3(1.5, 1.5, 1.5), lerpSpeed);
                     } else {
+                        // Regular Chaos Mode
                         let target = group.userData.chaosPos.clone();
+                        
+                        // FIX: Hover Effect Logic
+                        let scaleTarget = 1.0;
                         if (STATE.mode === 'FOCUS') {
-                            group.scale.lerp(new THREE.Vector3(0.5, 0.5, 0.5), lerpSpeed);
-                        } else {
-                            group.scale.lerp(new THREE.Vector3(1, 1, 1), lerpSpeed);
-                            target.y += Math.sin(time + group.id) * 0.5;
+                            scaleTarget = 0.5;
+                        } else if (group === hoveredPhoto) {
+                            scaleTarget = 1.15; // Pop out
+                            // Pull closer to camera slightly if hovered to help selection
+                            const dirToCam = camera.position.clone().sub(target).normalize();
+                            target.add(dirToCam.multiplyScalar(2));
                         }
+
+                        group.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), lerpSpeed);
+                        target.y += Math.sin(time + group.id) * 0.5;
+                        
                         group.position.lerp(target, lerpSpeed);
                         group.lookAt(camera.position);
                     }
@@ -583,6 +612,7 @@
             composer.setSize(window.innerWidth, window.innerHeight);
         };
 
+        // --- MediaPipe Logic ---
         const videoElement = document.getElementById('input-video');
         const startBtn = document.getElementById('start-btn');
         const feedbackEl = document.getElementById('gesture-feedback');
@@ -651,26 +681,22 @@
             if (gesture === 'PINCH') {
                 STATE.isPinching = true;
                 if (STATE.mode !== 'TREE') {
-                    raycaster.setFromCamera(STATE.handPosition, camera); 
-                    const intersects = raycaster.intersectObjects(photoGroups, true); 
-                    if (intersects.length > 0) {
-                        let target = intersects[0].object;
-                        while(target.parent && !photoMeshes.includes(target)) { target = target.parent; }
-                        if (photoMeshes.includes(target)) {
-                            if (focusedPhoto !== target) {
-                                if (focusedPhoto && focusedPhoto.userData.video) focusedPhoto.userData.video.muted = true;
-                                focusedPhoto = target;
-                                if (focusedPhoto.userData.video) {
-                                    focusedPhoto.userData.video.muted = false;
-                                    focusedPhoto.userData.video.play().catch(e => {
-                                        console.warn("Autoplay blocked, playing muted", e);
-                                        focusedPhoto.userData.video.muted = true;
-                                        focusedPhoto.userData.video.play();
-                                    });
-                                }
+                    // Use the globally tracked hovered item for smoother selection
+                    if (hoveredPhoto) {
+                        let target = hoveredPhoto;
+                        if (focusedPhoto !== target) {
+                            if (focusedPhoto && focusedPhoto.userData.video) focusedPhoto.userData.video.muted = true;
+                            focusedPhoto = target;
+                            if (focusedPhoto.userData.video) {
+                                focusedPhoto.userData.video.muted = false;
+                                focusedPhoto.userData.video.play().catch(e => {
+                                    console.warn("Autoplay blocked, playing muted", e);
+                                    focusedPhoto.userData.video.muted = true;
+                                    focusedPhoto.userData.video.play();
+                                });
                             }
-                            STATE.mode = 'FOCUS';
                         }
+                        STATE.mode = 'FOCUS';
                     }
                 }
                 updateFeedback("PINCH: GRAB MEMORY", "red");
